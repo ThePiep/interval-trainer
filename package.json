@@ -12,6 +12,7 @@
     "lodash": "^4.17.21",
     "midi-sounds-react": "^1.2.54",
     "note-parser": "^2.0.1",
+    "pitch-analyser": "^1.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tonal-note": "^2.2.2",

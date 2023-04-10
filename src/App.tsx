@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react'
 import './App.css'
 import MIDISounds from 'midi-sounds-react';
 import * as TonalNote from 'tonal-note';
+import { SelectRoot } from './components/SelectRoot';
+import { PitchAnalysis } from './components/PitchAnalysis';
 
 interface Note {
   name: string
@@ -27,6 +29,9 @@ const App = (): JSX.Element => {
   const activeNotesRef = useRef(activeNotes);
   activeNotesRef.current = activeNotes;
 
+  const [target, setTarget] = useState<number>();
+  const [showTarget, setShowTarget] = useState<boolean>(false);
+
   const interval: IntervalNote[] = [
     { interval: 0, name: 'root' },
     { interval: 2, name: '2nd' },
@@ -51,7 +56,9 @@ const App = (): JSX.Element => {
       if (activeNotesRef.current.size === 0) {
         stop()
       } else {
-        midiSounds.playStrumDownNow(378, [getRandomNote()], 1);
+        const randomNote = getRandomNote();
+        setTarget(randomNote)
+        midiSounds.playStrumDownNow(378, [randomNote], 1);
       }
     }, 1400);
   }
@@ -94,23 +101,6 @@ const App = (): JSX.Element => {
     });
   }
 
-  const selectRoot = (): JSX.Element => {
-    const octave = 3;
-    return <>
-      <label htmlFor='root-selector'>Root: </label>
-      <select name='root-selector'>{TonalNote.names(' #').map((name) => {
-        const midiValue = TonalNote.midi(name + octave.toString());
-        return <option
-          key={midiValue}
-          onClick={() => { setRoot(midiValue ?? 48); }}
-        >
-          {name}{octave}
-        </option>;
-      }
-      )}</select>
-    </>
-  }
-
   const selectInterval = (): JSX.Element[] => {
     return interval.map((elem) => {
       return <button
@@ -130,8 +120,7 @@ const App = (): JSX.Element => {
         <button onClick={() => { isPlaying ? stop() : start() }}>
           {isPlaying ? 'Stop' : 'Start'} interval
         </button>
-        {/* <p>Select root:</p> */}
-        <p>{selectRoot()}</p>
+        <SelectRoot root={root} setRoot={setRoot} />
         <p>Select interval:</p>
         {selectInterval()}
         <p>
@@ -144,8 +133,10 @@ const App = (): JSX.Element => {
           <button onClick={() => { setActiveNotes(new Set([2, 3, 5, 7, 8, 10, 12])); }}>Minor Scale</button>
         </p>
       </div>
-      <span style={{ display: 'none' }}>
+      <p><button onClick={() => { setShowTarget((prev) => !prev) }}>Show target</button> {showTarget && target && TonalNote.fromMidi(target)}</p>
+      <PitchAnalysis></PitchAnalysis>
 
+      <span style={{ display: 'none' }}>
         <MIDISounds ref={(ref) => { setMidiSounds(ref); }} appElementName="root" instruments={[3, 375, 376, 377, 378]} />
       </span>
     </div >
