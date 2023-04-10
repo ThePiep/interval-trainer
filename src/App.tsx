@@ -94,23 +94,21 @@ const App = (): JSX.Element => {
     });
   }
 
-  const selectRootNote = (): JSX.Element => {
-    const octaves = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    return <ul>{octaves.map((octave) => {
-      return <li key={octave}>{TonalNote.names(' #')
-        .map((name) => {
-          const midiValue = TonalNote.midi(name + octave.toString());
-          return <button
-            onClick={() => { setRoot(midiValue ?? 48) }}
-            className={root === midiValue ? 'selected' : ''}
-            key={midiValue}
-          >
-            {name + octave.toString()}
-          </button>;
-        })}
-      </li>
-    })}
-    </ul>
+  const selectRoot = (): JSX.Element => {
+    const octave = 3;
+    return <>
+      <label htmlFor='root-selector'>Root: </label>
+      <select name='root-selector'>{TonalNote.names(' #').map((name) => {
+        const midiValue = TonalNote.midi(name + octave.toString());
+        return <option
+          key={midiValue}
+          onClick={() => { setRoot(midiValue ?? 48); }}
+        >
+          {name}{octave}
+        </option>;
+      }
+      )}</select>
+    </>
   }
 
   const selectInterval = (): JSX.Element[] => {
@@ -132,8 +130,8 @@ const App = (): JSX.Element => {
         <button onClick={() => { isPlaying ? stop() : start() }}>
           {isPlaying ? 'Stop' : 'Start'} interval
         </button>
-        <p>Select root:</p>
-        {selectRootNote()}
+        {/* <p>Select root:</p> */}
+        <p>{selectRoot()}</p>
         <p>Select interval:</p>
         {selectInterval()}
         <p>
@@ -141,6 +139,7 @@ const App = (): JSX.Element => {
         </p>
         <p>
           <button onClick={() => { setActiveNotes(new Set([0, 5, 7])); }}>i-iv-v</button>
+          <button onClick={() => { setActiveNotes(new Set([2, 4, 5, 7])); }}>ii-iii-iv-v</button>
           <button onClick={() => { setActiveNotes(new Set([2, 4, 5, 7, 9, 11, 12])) }}>Major Scale</button>
           <button onClick={() => { setActiveNotes(new Set([2, 3, 5, 7, 8, 10, 12])); }}>Minor Scale</button>
         </p>
